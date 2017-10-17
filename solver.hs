@@ -5,7 +5,7 @@ import Data.List.Split
 import Data.Set as Set (toList, fromList)
 import Data.Maybe as Maybe
 
-
+--data type for holding information about each individual board 'square'
 data Square = Square {
     solved :: Bool,
     solution :: Int,
@@ -14,11 +14,12 @@ data Square = Square {
     relatedIndexes :: [Int]
 }
 
+--type alias for list of squares representing the the game 'board'
 type Board = [Square]
 
 
--- getRowIndexes, getColumnIndexes, and getBoxIndexes are used exclusively for buildSquare
-
+--getRowIndexes, getColumnIndexes, and getBoxIndexes are used exclusively for buildSquare
+--helper functions
 getRowIndexes :: Int -> [Int]
 getRowIndexes indexVal =
     let leftMostIndex = last $ takeWhile (<=indexVal) [0, 9..81]
@@ -29,7 +30,7 @@ getColumnIndexes indexVal =
     let topMostIndex = indexVal - (head $ dropWhile (\x -> indexVal - x > 8) [0, 9..81])
     in map (+topMostIndex) [0, 9..72]
 
-getBoxIndexes :: Int -> [Int] --sorry about this, said fuck it
+getBoxIndexes :: Int -> [Int] 
 getBoxIndexes indexVal =
     let indexGroup1 = [0,1,2,9,10,11,18,19,20]
         indexGroups = [  indexGroup1           ,
@@ -76,14 +77,15 @@ getRelatedSquares :: [Int] -> Board -> [Square]
 getRelatedSquares relatedIndexesVal board =
     map (\indexVal -> board !! indexVal) relatedIndexesVal
 
-
+--checks to see if square only has one possible value left, and if true then
+--sets the 'solved' field to true
 updateSolved :: [Int] -> Square -> Square
 updateSolved updatedPossibleSolutions@(x:xs) (Square solvedVal solutionVal _ indexVal relatedIndexesVal)
     | null xs = Square True x [x] indexVal relatedIndexesVal
     | otherwise = Square solvedVal solutionVal updatedPossibleSolutions indexVal relatedIndexesVal
 
 
-
+--removes already solved values in adjacent squares from possible solutions list
 updatePossibleSolutions :: [Int] -> [Int] -> [Int]
 updatePossibleSolutions oldSolutions [x]
     | x `elem` oldSolutions = delete x oldSolutions
@@ -91,7 +93,9 @@ updatePossibleSolutions oldSolutions [x]
 updatePossibleSolutions oldSolutions comparedSolutions =
     oldSolutions
 
-
+--looks at adjacent squares to see if they are solved for a value that is still
+--a possible solution from square passed to function, then removes that value
+--from possible solutions
 updateSquare :: Square -> Board -> Square
 updateSquare square@(Square solved _ possibleSolutionsIn index relatedIndexes) board =
     if not solved then
@@ -101,7 +105,7 @@ updateSquare square@(Square solved _ possibleSolutionsIn index relatedIndexes) b
     else
         square
 
-
+--recursively updates squares until all squares are solved, then returns board
 solvePuzzle :: Board -> Board
 solvePuzzle board =
     if not $ puzzleSolved board then
@@ -121,7 +125,9 @@ showSolution board = helper board
             >> (putStrLn "") >> (helper $ drop 9 board)
 
 
-
+--main function
+--opens data file with test 'board', creates representation of board in
+--program, and solves the puzzle
 main :: IO()
 main = do
     handle <- openFile "testPuzzle.csv" ReadMode
