@@ -30,7 +30,7 @@ getColumnIndexes indexVal =
     let topMostIndex = indexVal - (head $ dropWhile (\x -> indexVal - x > 8) [0, 9..81])
     in map (+topMostIndex) [0, 9..72]
 
-getBoxIndexes :: Int -> [Int] 
+getBoxIndexes :: Int -> [Int]
 getBoxIndexes indexVal =
     let indexGroup1 = [0,1,2,9,10,11,18,19,20]
         indexGroups = [  indexGroup1           ,
@@ -116,6 +116,8 @@ solvePuzzle board =
     where
         puzzleSolved = all solved
 
+--recursively prints lines of boards by mapping IO functions to the data type's
+--"solution" field 
 showSolution :: Board -> IO()
 showSolution board = helper board
     where
